@@ -12,10 +12,10 @@ const generateShortId = function () {
   return ('000000' + (Math.random() * Math.pow(36, 6) << 0).toString(36)).slice(-6);
 };
 
-const initYourPlayerMux = function (player, options) {
+const monitorTizenPlayer = function (player, options) {
   // Make sure we got a player - Check properties to ensure that a player was passed
   if (typeof player !== 'object' || typeof player.getVersion !== 'function') {
-    log.warn('[yourPlayer-mux] You must provide a valid yourPlayer to initYourPlayerMux.');
+    log.warn('[tizen-mux] You must provide a valid tizen to monitorTizenPlayer.');
     return;
   }
 
@@ -269,4 +269,4 @@ const initYourPlayerMux = function (player, options) {
   mux.init(playerID, options);
 };
 
-export default initYourPlayerMux;
+export default monitorTizenPlayer;

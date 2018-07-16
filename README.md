@@ -1,6 +1,6 @@
-# yourPlayer-mux
+# tizen-mux
 
-The yourPlayer plugin for Mux Analytics
+The tizen plugin for Mux Analytics
 
 ## Using
 
@@ -8,7 +8,7 @@ Install dependencies:
 
 `npm install`
 
-Modify `src/index.js`, `scripts/deploy.js`, the webpack config files, `package.json`, `ads.html`, and `index.html` to remove any references to `yourPlayer`.
+Modify `src/index.js`, `scripts/deploy.js`, the webpack config files, `package.json`, `ads.html`, and `index.html` to remove any references to `tizen`.
 The majority of your code will be in `src/index.js`
 
 Once the code has been completed, run the following to build the package

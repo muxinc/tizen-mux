@@ -4,9 +4,9 @@ const WebpackAutoInject = require('webpack-auto-inject-version');
 module.exports = {
   entry: './src/entry.js',
   output: {
-    filename: 'yourPlayer-mux.js',
+    filename: 'tizen-mux.js',
     path: path.resolve(__dirname, 'build'),
-    library: 'initYourPlayerMux',
+    library: 'monitorTizenPlayer',
     libraryTarget: 'umd',
     umdNamedDefine: true
   },

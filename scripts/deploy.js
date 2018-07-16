@@ -32,7 +32,7 @@ function uploadFile (bucket, file, version) {
   return new Promise((resolve, reject) => {
     let params = {
       Body: file,
-      Key: `yourPlayer/${version}/yourPlayer-mux.js`,
+      Key: `tizen/${version}/tizen-mux.js`,
       ACL: 'public-read',
       ContentType: 'application/javascript'
     };
