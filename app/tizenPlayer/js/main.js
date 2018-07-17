@@ -133,6 +133,7 @@ var app = {
           },
 
           onstreamcompleted: function () {
+        	  app.stop();
           },
 
           onevent: function (eventType, eventData) {
@@ -147,27 +148,23 @@ var app = {
 
           onsubtitlechange: function(duration, text, type, attriCount, attributes) {
           }
-      };
-      mux.monitor('#thePlayer', {
+      }
+      var player = $('#thePlayer').get(0);
+      player.url = this.url;
+      player.playbackCallback = playbackListener;
+      tizenMux.monitorTizenPlayer(player, {
           debug: true,
-          tizen: {
-            dom: $('#thePlayer').get(0),
-            url: this.url,
-            playbackCallback: playbackListener,
-          },
           data: {
             video_title: 'BigBuckBunny.smil',
-            player_init_time: Date.now(),
             env_key: 'hrca1hhidk4je5lbtcvjsj4sm',
-            player_software: 'Tizen AVPayer',
-            player_software_version: webapis.avplay.getVersion()
           }
       });
       this.prepare();
     },
 
     stop: function() {
-      mux.destroyMonitor('#thePlayer');
+      var player = $('#thePlayer').get(0);
+      tizenMux.stopMonitor(player);
       webapis.avplay.stop();
     }
 };

@@ -4,4 +4,4 @@
  * in a browser, we have to do this.
  */
 
-module.exports = require('./index.js').default;
+module.exports = require('./index.js');

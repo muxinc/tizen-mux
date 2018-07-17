@@ -6,7 +6,7 @@ module.exports = {
   output: {
     filename: 'tizen-mux.js',
     path: path.resolve(__dirname, 'build'),
-    library: 'monitorTizenPlayer',
+    library: 'tizenMux',
     libraryTarget: 'umd',
     umdNamedDefine: true
   },
