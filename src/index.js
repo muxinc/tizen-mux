@@ -29,7 +29,6 @@ const monitorTizenPlayer = function (player, options) {
     player_software_version: webapis.avplay.getVersion(), // Replace with method to retrieve the version of the player as necessary
     player_mux_plugin_name: 'tizen-mux',
     player_mux_plugin_version: '[AIV]{version}[/AIV]',
-    player_init_time: Date.now(),
   }, options.data);
 
   // Retrieve the ID and the player element
@@ -42,22 +41,22 @@ const monitorTizenPlayer = function (player, options) {
   };
 
   // Player state data
-  player.lastPlayerState = 'NONE';
-  player.videoSourceWidth = 0;
-  player.videoSourceHeight = 0;
-  player.loadStarts = false;
-  player.onResolutionChanged = function() {
+  var lastPlayerState = 'NONE';
+  var videoSourceWidth = 0;
+  var videoSourceHeight = 0;
+  var loadStarts = false;
+  var onResolutionChanged = function() {
     let streamInfo = webapis.avplay.getCurrentStreamInfo();
     for (let i = 0; i < streamInfo.length; i++) {
       let track = streamInfo[i];
       if (track.type == 'VIDEO' && track.extra_info) {
         if (typeof track.extra_info === 'string') {
           let json = JSON.parse(track.extra_info);
-          this.videoSourceWidth = parseInt(json.Width);
-          this.videoSourceHeight = parseInt(json.Height);
+          videoSourceWidth = parseInt(json.Width);
+          videoSourceHeight = parseInt(json.Height);
         } else {
-          this.videoSourceWidth = track.extra_info.Width;
-          this.videoSourceHeight = track.extra_info.Height;
+          videoSourceWidth = track.extra_info.Width;
+          videoSourceHeight = track.extra_info.Height;
         }
       }
     }
@@ -88,7 +87,6 @@ const monitorTizenPlayer = function (player, options) {
     let stateData = {
       // Required properties - these must be provided every time this is called
       // You _should_ only provide these values if they are defined (i.e. not 'undefined')
-      player_is_paused: webapis.avplay.getState() == 'PAUSED',
       player_width: player.offsetWidth,
       player_height: player.offsetHeight,
 
@@ -106,14 +104,16 @@ const monitorTizenPlayer = function (player, options) {
     };
 
     // Additional required properties
-    if (player.videoSourceWidth != 0) {
-      stateData.video_source_width = player.videoSourceWidth;
+    var state = webapis.avplay.getState();
+    stateData.player_is_paused = (state == 'NONE' || state == 'IDLE' || state == 'READY' || state == 'PAUSED');
+    if (videoSourceWidth != 0) {
+      stateData.video_source_width = videoSourceWidth;
     }
-    if (player.videoSourceHeight != 0) {
-      stateData.video_source_height = player.videoSourceHeight;
+    if (videoSourceHeight != 0) {
+      stateData.video_source_height = videoSourceHeight;
     }
     // Additional peferred properties
-    if (player.lastPlayerState != 'NONE' && player.lastPlayerState != 'IDLE') {
+    if (lastPlayerState != 'NONE' && lastPlayerState != 'IDLE') {
       const duration = webapis.avplay.getDuration();
       stateData.video_source_duration = (duration == 0 ? Infinity : duration);
     }
@@ -128,9 +128,9 @@ const monitorTizenPlayer = function (player, options) {
   // a single event for breaking to a midroll ad, and mux requires a `pause` and an `adbreakstart` event both)
   let playbackListener = {
     onbufferingstart: function () {
-      if (!this.loadStarts) {
+      if (!loadStarts) {
         this.mux.emit('loadstart', {});
-        this.loadStarts = true;
+        loadStarts = true;
       }
       if (this.playbackCallback && this.playbackCallback.onbufferingstart) {
         this.playbackCallback.onbufferingstart();
@@ -167,7 +167,7 @@ const monitorTizenPlayer = function (player, options) {
       if (eventType == 'PLAYER_MSG_BITRATE_CHANGE') {
         this.mux.emit('ratechange', {});
       } else if (eventType == 'PLAYER_MSG_RESOLUTION_CHANGED') {
-        this.onResolutionChanged();
+        onResolutionChanged();
       } else if (eventType == 'PLAYER_MSG_FRAGMENT_INFO') {
         // not detected on both sample HLS and Dash stream
         // thus no way to do bandwidth metric fragment loadData collection
@@ -208,24 +208,24 @@ const monitorTizenPlayer = function (player, options) {
   player.checkStatusInterval = window.setInterval(function() {
     try {
       let playerState = webapis.avplay.getState();
-      if (this.lastPlayerState == 'NONE' || this.lastPlayerState == 'READY' || this.lastPlayerState == 'IDLE') {
+      if (lastPlayerState == 'NONE' || lastPlayerState == 'READY' || lastPlayerState == 'IDLE') {
         if (playerState == 'PLAYING') {
-          this.onResolutionChanged();
+          onResolutionChanged();
           this.mux.emit('playing', {});
         }
-      } else if (this.lastPlayerState == 'PLAYING') {
+      } else if (lastPlayerState == 'PLAYING') {
         if (playerState == 'PAUSED') {
           this.mux.emit('pause', {});
         }
-      } else if (this.lastPlayerState == 'PAUSED') {
+      } else if (lastPlayerState == 'PAUSED') {
         if (playerState == 'PLAYING') {
           this.mux.emit('playing', {});
         }
       }
-      if (this.lastPlayerState != playerState) {
-        log.info('state transition ' + this.lastPlayerState + ' -> ' + playerState);
+      if (lastPlayerState != playerState) {
+        log.info('state transition ' + lastPlayerState + ' -> ' + playerState);
       }
-      this.lastPlayerState = playerState;
+      lastPlayerState = playerState;
     } catch(e) {
       log.error(e);
     }

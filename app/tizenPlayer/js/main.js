@@ -152,14 +152,16 @@ var app = {
       var player = $('#thePlayer').get(0);
       player.url = this.url;
       player.playbackCallback = playbackListener;
+      var playerInitTime = Date.now();
+      this.prepare();
       tizenMux.monitorTizenPlayer(player, {
           debug: true,
           data: {
             video_title: 'BigBuckBunny.smil',
             env_key: 'hrca1hhidk4je5lbtcvjsj4sm',
+            player_init_time: playerInitTime,
           }
       });
-      this.prepare();
     },
 
     stop: function() {
