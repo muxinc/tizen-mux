@@ -46,7 +46,6 @@ const monitorTizenPlayer = function (player, options) {
   player.videoSourceWidth = 0;
   player.videoSourceHeight = 0;
   player.loadStarts = false;
-  player.playStarts = false;
   player.onResolutionChanged = function() {
     let streamInfo = webapis.avplay.getCurrentStreamInfo();
     for (let i = 0; i < streamInfo.length; i++) {
@@ -87,47 +86,36 @@ const monitorTizenPlayer = function (player, options) {
   //    };
   options.getStateData = () => {
     let stateData = {
+      // Required properties - these must be provided every time this is called
+      // You _should_ only provide these values if they are defined (i.e. not 'undefined')
       player_is_paused: webapis.avplay.getState() == 'PAUSED',
-      player_playhead_time: webapis.avplay.getCurrentTime(),
       player_width: player.offsetWidth,
-      player_height: player.offsetHeight
+      player_height: player.offsetHeight,
+
+      // Preferred properties - these should be provided in this callback if possible
+      // If any are missing, that is okay, but this will be a lack of data for the customer at a later time
+      player_is_fullscreen: player.fullscreen,
+      player_autoplay_on: player.autoplay,
+      player_preload_on: player.preload,
+      video_source_url: player.url,
+      video_source_mime_type: player.mimeType,
+
+      // Optional properties - if you have them, send them, but if not, no big deal
+      video_poster_url: player.poster,
+      player_language_code: player.language,
     };
-    // Required properties - these must be provided every time this is called
-    // You _should_ only provide these values if they are defined (i.e. not 'undefined')
+
+    // Additional required properties
     if (player.videoSourceWidth != 0) {
       stateData.video_source_width = player.videoSourceWidth;
     }
     if (player.videoSourceHeight != 0) {
       stateData.video_source_height = player.videoSourceHeight;
     }
-
-    // Preferred properties - these should be provided in this callback if possible
-    // If any are missing, that is okay, but this will be a lack of data for the customer at a later time
-    if (player.fullscreen != undefined) {
-      stateData.player_is_fullscreen = player.fullscreen;
-    }
-    if (player.autoplay != undefined) {
-      stateData.player_autoplay_on = player.autoplay;
-    }
-    if (player.preload != undefined) {
-      stateData.player_preload_on = player.preload;
-    }
-    if (player.url != undefined) {
-      stateData.video_source_url = player.url;
-    }
-    if (player.mimeType != undefined) {
-      stateData.video_source_mime_type = player.mimeType;
-    }
+    // Additional peferred properties
     if (player.lastPlayerState != 'NONE' && player.lastPlayerState != 'IDLE') {
-      stateData.video_source_duration = (webapis.avplay.getDuration() == 0 ? Infinity : webapis.avplay.getDuration());
-    }
-
-    // Optional properties - if you have them, send them, but if not, no big deal
-    if (player.poster != undefined) {
-      stateData.video_poster_url = player.poster;
-    }
-    if (player.language != undefined) {
-      stateData.player_language_code = player.language;
+      const duration = webapis.avplay.getDuration();
+      stateData.video_source_duration = (duration == 0 ? Infinity : duration);
     }
 
     return stateData;
@@ -156,14 +144,6 @@ const monitorTizenPlayer = function (player, options) {
     }.bind(player),
 
     onbufferingcomplete: function () {
-      if (!this.playStarts) {
-        this.playStarts = true;
-        log.info('All tracks info,');
-        let tracks = webapis.avplay.getTotalTrackInfo();
-        for (let i = 0; i < tracks.length; i++) {
-          log.info(tracks[i]);
-        }
-      }
       if (this.playbackCallback && this.playbackCallback.onbufferingcomplete) {
         this.playbackCallback.onbufferingcomplete();
       }
