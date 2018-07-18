@@ -144,13 +144,13 @@ const monitorTizenPlayer = function (player, options) {
         this.mux.emit('loadstart', {});
         this.loadStarts = true;
       }
-      if (this.playbackCallback) {
+      if (this.playbackCallback && this.playbackCallback.onbufferingstart) {
         this.playbackCallback.onbufferingstart();
       }
     }.bind(player),
 
     onbufferingprogress: function (percent) {
-      if (this.playbackCallback) {
+      if (this.playbackCallback && this.playbackCallback.onbufferingprogress) {
         this.playbackCallback.onbufferingprogress(percent);
       }
     }.bind(player),
@@ -164,21 +164,21 @@ const monitorTizenPlayer = function (player, options) {
           log.info(tracks[i]);
         }
       }
-      if (this.playbackCallback) {
+      if (this.playbackCallback && this.playbackCallback.onbufferingcomplete) {
         this.playbackCallback.onbufferingcomplete();
       }
     }.bind(player),
 
     oncurrentplaytime: function (currentTime) {
       this.mux.emit('timeupdate', {});
-      if (this.playbackCallback) {
+      if (this.playbackCallback && this.playbackCallback.oncurrentplaytime) {
         this.playbackCallback.oncurrentplaytime(currentTime);
       }
     }.bind(player),
 
     onstreamcompleted: function () {
       this.mux.emit('ended', {});
-      if (this.playbackCallback) {
+      if (this.playbackCallback && this.playbackCallback.onstreamcompleted) {
         this.playbackCallback.onstreamcompleted();
       }
     }.bind(player),
@@ -194,7 +194,7 @@ const monitorTizenPlayer = function (player, options) {
       } else if (eventType == 'PLAYER_MSG_HTTP_ERROR_CODE') {
         // placeholder for bandwidth metric fragment download error collection
       }
-      if (this.playbackCallback) {
+      if (this.playbackCallback && this.playbackCallback.onevent) {
         this.playbackCallback.onevent(eventType, eventData);
       }
 
@@ -206,19 +206,19 @@ const monitorTizenPlayer = function (player, options) {
         player_error_message: eventType
       };
       this.mux.emit('error', data);
-      if (this.playbackCallback) {
+      if (this.playbackCallback && this.playbackCallback.onerror) {
         this.playbackCallback.onerror(eventType);
       }
     }.bind(player),
 
     ondrmevent: function(drmEvent, drmData) {
-      if (this.playbackCallback) {
+      if (this.playbackCallback && this.playbackCallback.ondrmevent) {
         this.playbackCallback.ondrmevent(drmEvent, drmData);
       }
     }.bind(player),
 
     onsubtitlechange: function(duration, text, type, attriCount, attributes) {
-      if (this.playbackCallback) {
+      if (this.playbackCallback && this.playbackCallback.onsubtitlechange) {
         this.playbackCallback.onsubtitlechange(duration, text, type, attriCount, attributes);
       }
     }.bind(player)
