@@ -133,33 +133,43 @@ const monitorTizenPlayer = function (player, options) {
         loadStarts = true;
       }
       if (player.playbackCallback && player.playbackCallback.onbufferingstart) {
-        player.playbackCallback.onbufferingstart();
+        setTimeout(() => {
+          player.playbackCallback.onbufferingstart();
+        });
       }
     },
 
     onbufferingprogress: function (percent) {
       if (player.playbackCallback && player.playbackCallback.onbufferingprogress) {
-        player.playbackCallback.onbufferingprogress(percent);
+        setTimeout(() => {
+          player.playbackCallback.onbufferingprogress(percent);
+        });
       }
     },
 
     onbufferingcomplete: function () {
       if (player.playbackCallback && player.playbackCallback.onbufferingcomplete) {
-        player.playbackCallback.onbufferingcomplete();
+        setTimeout(() => {
+          player.playbackCallback.onbufferingcomplete();
+        });
       }
     },
 
     oncurrentplaytime: function (currentTime) {
       player.mux.emit('timeupdate');
       if (player.playbackCallback && player.playbackCallback.oncurrentplaytime) {
-        player.playbackCallback.oncurrentplaytime(currentTime);
+        setTimeout(() => {
+          player.playbackCallback.oncurrentplaytime(currentTime);
+        });
       }
     },
 
     onstreamcompleted: function () {
       player.mux.emit('ended');
       if (player.playbackCallback && player.playbackCallback.onstreamcompleted) {
-        player.playbackCallback.onstreamcompleted();
+        setTimeout(() => {
+          player.playbackCallback.onstreamcompleted();
+        });
       }
     },
 
@@ -175,7 +185,9 @@ const monitorTizenPlayer = function (player, options) {
         // placeholder for bandwidth metric fragment download error collection
       }
       if (player.playbackCallback && player.playbackCallback.onevent) {
-        player.playbackCallback.onevent(eventType, eventData);
+        setTimeout(() => {
+          player.playbackCallback.onevent(eventType, eventData);
+        });
       }
     },
 
@@ -186,19 +198,25 @@ const monitorTizenPlayer = function (player, options) {
       };
       player.mux.emit('error', data);
       if (player.playbackCallback && player.playbackCallback.onerror) {
-        player.playbackCallback.onerror(eventType);
+        setTimeout(() => {
+          player.playbackCallback.onerror(eventType);
+        });
       }
     },
 
     ondrmevent: function(drmEvent, drmData) {
       if (player.playbackCallback && player.playbackCallback.ondrmevent) {
-        player.playbackCallback.ondrmevent(drmEvent, drmData);
+        setTimeout(() => {
+          player.playbackCallback.ondrmevent(drmEvent, drmData);
+        });
       }
     },
 
     onsubtitlechange: function(duration, text, type, attriCount, attributes) {
       if (player.playbackCallback && player.playbackCallback.onsubtitlechange) {
-        player.playbackCallback.onsubtitlechange(duration, text, type, attriCount, attributes);
+        setTimeout(() => {
+          player.playbackCallback.onsubtitlechange(duration, text, type, attriCount, attributes);
+        });
       }
     }
   };
