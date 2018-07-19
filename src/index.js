@@ -129,43 +129,43 @@ const monitorTizenPlayer = function (player, options) {
   let playbackListener = {
     onbufferingstart: function () {
       if (!loadStarts) {
-        this.mux.emit('loadstart', {});
+        player.mux.emit('loadstart');
         loadStarts = true;
       }
-      if (this.playbackCallback && this.playbackCallback.onbufferingstart) {
-        this.playbackCallback.onbufferingstart();
+      if (player.playbackCallback && player.playbackCallback.onbufferingstart) {
+        player.playbackCallback.onbufferingstart();
       }
-    }.bind(player),
+    },
 
     onbufferingprogress: function (percent) {
-      if (this.playbackCallback && this.playbackCallback.onbufferingprogress) {
-        this.playbackCallback.onbufferingprogress(percent);
+      if (player.playbackCallback && player.playbackCallback.onbufferingprogress) {
+        player.playbackCallback.onbufferingprogress(percent);
       }
-    }.bind(player),
+    },
 
     onbufferingcomplete: function () {
-      if (this.playbackCallback && this.playbackCallback.onbufferingcomplete) {
-        this.playbackCallback.onbufferingcomplete();
+      if (player.playbackCallback && player.playbackCallback.onbufferingcomplete) {
+        player.playbackCallback.onbufferingcomplete();
       }
-    }.bind(player),
+    },
 
     oncurrentplaytime: function (currentTime) {
-      this.mux.emit('timeupdate', {});
-      if (this.playbackCallback && this.playbackCallback.oncurrentplaytime) {
-        this.playbackCallback.oncurrentplaytime(currentTime);
+      player.mux.emit('timeupdate');
+      if (player.playbackCallback && player.playbackCallback.oncurrentplaytime) {
+        player.playbackCallback.oncurrentplaytime(currentTime);
       }
-    }.bind(player),
+    },
 
     onstreamcompleted: function () {
-      this.mux.emit('ended', {});
-      if (this.playbackCallback && this.playbackCallback.onstreamcompleted) {
-        this.playbackCallback.onstreamcompleted();
+      player.mux.emit('ended');
+      if (player.playbackCallback && player.playbackCallback.onstreamcompleted) {
+        player.playbackCallback.onstreamcompleted();
       }
-    }.bind(player),
+    },
 
     onevent: function (eventType, eventData) {
       if (eventType == 'PLAYER_MSG_BITRATE_CHANGE') {
-        this.mux.emit('ratechange', {});
+        player.mux.emit('ratechange');
       } else if (eventType == 'PLAYER_MSG_RESOLUTION_CHANGED') {
         onResolutionChanged();
       } else if (eventType == 'PLAYER_MSG_FRAGMENT_INFO') {
@@ -174,34 +174,33 @@ const monitorTizenPlayer = function (player, options) {
       } else if (eventType == 'PLAYER_MSG_HTTP_ERROR_CODE') {
         // placeholder for bandwidth metric fragment download error collection
       }
-      if (this.playbackCallback && this.playbackCallback.onevent) {
-        this.playbackCallback.onevent(eventType, eventData);
+      if (player.playbackCallback && player.playbackCallback.onevent) {
+        player.playbackCallback.onevent(eventType, eventData);
       }
-
-    }.bind(player),
+    },
 
     onerror: function (eventType) {
       let data = {
         player_error_code: -1,
         player_error_message: eventType
       };
-      this.mux.emit('error', data);
-      if (this.playbackCallback && this.playbackCallback.onerror) {
-        this.playbackCallback.onerror(eventType);
+      player.mux.emit('error', data);
+      if (player.playbackCallback && player.playbackCallback.onerror) {
+        player.playbackCallback.onerror(eventType);
       }
-    }.bind(player),
+    },
 
     ondrmevent: function(drmEvent, drmData) {
-      if (this.playbackCallback && this.playbackCallback.ondrmevent) {
-        this.playbackCallback.ondrmevent(drmEvent, drmData);
+      if (player.playbackCallback && player.playbackCallback.ondrmevent) {
+        player.playbackCallback.ondrmevent(drmEvent, drmData);
       }
-    }.bind(player),
+    },
 
     onsubtitlechange: function(duration, text, type, attriCount, attributes) {
-      if (this.playbackCallback && this.playbackCallback.onsubtitlechange) {
-        this.playbackCallback.onsubtitlechange(duration, text, type, attriCount, attributes);
+      if (player.playbackCallback && player.playbackCallback.onsubtitlechange) {
+        player.playbackCallback.onsubtitlechange(duration, text, type, attriCount, attributes);
       }
-    }.bind(player)
+    }
   };
   webapis.avplay.setListener(playbackListener);
 
@@ -211,15 +210,15 @@ const monitorTizenPlayer = function (player, options) {
       if (lastPlayerState == 'NONE' || lastPlayerState == 'READY' || lastPlayerState == 'IDLE') {
         if (playerState == 'PLAYING') {
           onResolutionChanged();
-          this.mux.emit('playing', {});
+          player.mux.emit('playing');
         }
       } else if (lastPlayerState == 'PLAYING') {
         if (playerState == 'PAUSED') {
-          this.mux.emit('pause', {});
+          player.mux.emit('pause');
         }
       } else if (lastPlayerState == 'PAUSED') {
         if (playerState == 'PLAYING') {
-          this.mux.emit('playing', {});
+          player.mux.emit('playing');
         }
       }
       if (lastPlayerState != playerState) {
@@ -229,7 +228,7 @@ const monitorTizenPlayer = function (player, options) {
     } catch(e) {
       log.error(e);
     }
-  }.bind(player), 50);
+  }, 50);
 
   // Lastly, initialize the tracking
   mux.init(playerID, options);
@@ -240,8 +239,8 @@ const stopMonitor = function (player) {
   if (player.playbackCallback) {
     webapis.avplay.setListener(player.playbackCallback);
   }
-  player.mux.emit('destroy', {});
-  player.mux.emit = function(){};
+  player.mux.emit('destroy');
+  player.mux = function(){};
 }
 
 export { monitorTizenPlayer, stopMonitor };
