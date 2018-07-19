@@ -135,7 +135,7 @@ const monitorTizenPlayer = function (player, options) {
       if (player.playbackCallback && player.playbackCallback.onbufferingstart) {
         setTimeout(() => {
           player.playbackCallback.onbufferingstart();
-        });
+        }, 0);
       }
     },
 
@@ -143,7 +143,7 @@ const monitorTizenPlayer = function (player, options) {
       if (player.playbackCallback && player.playbackCallback.onbufferingprogress) {
         setTimeout(() => {
           player.playbackCallback.onbufferingprogress(percent);
-        });
+        }, 0);
       }
     },
 
@@ -151,7 +151,7 @@ const monitorTizenPlayer = function (player, options) {
       if (player.playbackCallback && player.playbackCallback.onbufferingcomplete) {
         setTimeout(() => {
           player.playbackCallback.onbufferingcomplete();
-        });
+        }, 0);
       }
     },
 
@@ -160,7 +160,7 @@ const monitorTizenPlayer = function (player, options) {
       if (player.playbackCallback && player.playbackCallback.oncurrentplaytime) {
         setTimeout(() => {
           player.playbackCallback.oncurrentplaytime(currentTime);
-        });
+        }, 0);
       }
     },
 
@@ -169,7 +169,7 @@ const monitorTizenPlayer = function (player, options) {
       if (player.playbackCallback && player.playbackCallback.onstreamcompleted) {
         setTimeout(() => {
           player.playbackCallback.onstreamcompleted();
-        });
+        }, 0);
       }
     },
 
@@ -187,7 +187,7 @@ const monitorTizenPlayer = function (player, options) {
       if (player.playbackCallback && player.playbackCallback.onevent) {
         setTimeout(() => {
           player.playbackCallback.onevent(eventType, eventData);
-        });
+        }, 0);
       }
     },
 
@@ -200,7 +200,7 @@ const monitorTizenPlayer = function (player, options) {
       if (player.playbackCallback && player.playbackCallback.onerror) {
         setTimeout(() => {
           player.playbackCallback.onerror(eventType);
-        });
+        }, 0);
       }
     },
 
@@ -208,7 +208,7 @@ const monitorTizenPlayer = function (player, options) {
       if (player.playbackCallback && player.playbackCallback.ondrmevent) {
         setTimeout(() => {
           player.playbackCallback.ondrmevent(drmEvent, drmData);
-        });
+        }, 0);
       }
     },
 
@@ -216,7 +216,7 @@ const monitorTizenPlayer = function (player, options) {
       if (player.playbackCallback && player.playbackCallback.onsubtitlechange) {
         setTimeout(() => {
           player.playbackCallback.onsubtitlechange(duration, text, type, attriCount, attributes);
-        });
+        }, 0);
       }
     }
   };
