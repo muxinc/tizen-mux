@@ -258,7 +258,7 @@ const stopMonitor = function (player) {
     webapis.avplay.setListener(player.playbackCallback);
   }
   player.mux.emit('destroy');
-  player.mux = function(){};
+  player.mux.emit = function(){};
 }
 
 export { monitorTizenPlayer, stopMonitor };
