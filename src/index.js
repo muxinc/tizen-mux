@@ -28,7 +28,7 @@ const monitorTizenPlayer = function (player, options) {
     player_software_name: 'Tizen AVPlayer',
     player_software_version: webapis.avplay.getVersion(), // Replace with method to retrieve the version of the player as necessary
     player_mux_plugin_name: 'tizen-mux',
-    player_mux_plugin_version: '[AIV]{version}[/AIV]',
+    player_mux_plugin_version: '0.1.0',
   }, options.data);
 
   // Retrieve the ID and the player element
