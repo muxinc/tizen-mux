@@ -179,10 +179,10 @@ const monitorTizenPlayer = function (player, options) {
       } else if (eventType == 'PLAYER_MSG_RESOLUTION_CHANGED') {
         onResolutionChanged();
       } else if (eventType == 'PLAYER_MSG_FRAGMENT_INFO') {
-        // not detected on both sample HLS and Dash stream
-        // thus no way to do bandwidth metric fragment loadData collection
+        // Note: This event was not fired while watching either our sample HLS or DASH streams.
+        // Without observing this event, we cannot implement any detailed request monitoring.
       } else if (eventType == 'PLAYER_MSG_HTTP_ERROR_CODE') {
-        // placeholder for bandwidth metric fragment download error collection
+        // Note: This event has the same problem as PLAYER_MSG_FRAGMENT_INFO.
       }
       if (player.playbackCallback && player.playbackCallback.onevent) {
         setTimeout(() => {
@@ -225,19 +225,25 @@ const monitorTizenPlayer = function (player, options) {
   player.checkStatusInterval = window.setInterval(function() {
     try {
       let playerState = webapis.avplay.getState();
-      if (lastPlayerState == 'NONE' || lastPlayerState == 'READY' || lastPlayerState == 'IDLE') {
-        if (playerState == 'PLAYING') {
-          onResolutionChanged();
-          player.mux.emit('playing');
-        }
-      } else if (lastPlayerState == 'PLAYING') {
-        if (playerState == 'PAUSED') {
-          player.mux.emit('pause');
-        }
-      } else if (lastPlayerState == 'PAUSED') {
-        if (playerState == 'PLAYING') {
-          player.mux.emit('playing');
-        }
+      switch (lastPlayerState) {
+        case 'NONE':
+        case 'READY':
+        case 'IDLE':
+          if (playerState == 'PLAYING') {
+            onResolutionChanged();
+            player.mux.emit('playing');
+          }
+          break;
+        case'PLAYING':
+          if (playerState == 'PAUSED') {
+            player.mux.emit('pause');
+          }
+          break;
+       case 'PAUSED':
+          if (playerState == 'PLAYING') {
+            player.mux.emit('playing');
+          }
+          break;
       }
       if (lastPlayerState != playerState) {
         log.info('state transition ' + lastPlayerState + ' -> ' + playerState);

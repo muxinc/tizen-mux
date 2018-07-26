@@ -157,8 +157,8 @@ var app = {
       tizenMux.monitorTizenPlayer(player, {
           debug: true,
           data: {
-            video_title: 'BigBuckBunny.smil',
-            env_key: 'hrca1hhidk4je5lbtcvjsj4sm',
+            video_title: 'Big Buck Bunny',
+            env_key: '[YOUR ENVIRONMENT KEY]',
             player_init_time: playerInitTime,
           }
       });
