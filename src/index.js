@@ -61,6 +61,8 @@ const monitorTizenPlayer = function (player, options) {
       }
     }
   };
+  var isBuffering = false;
+  var isSeeking = false;
 
   // Allow mux to retrieve the current time - used to track buffering from the mux side
   // Return current playhead time in milliseconds
@@ -128,6 +130,7 @@ const monitorTizenPlayer = function (player, options) {
   // a single event for breaking to a midroll ad, and mux requires a `pause` and an `adbreakstart` event both)
   let playbackListener = {
     onbufferingstart: function () {
+      isBuffering = true;
       if (!loadStarts) {
         player.mux.emit('loadstart');
         loadStarts = true;
@@ -148,6 +151,11 @@ const monitorTizenPlayer = function (player, options) {
     },
 
     onbufferingcomplete: function () {
+      isBuffering = false;
+      if (isSeeking) {
+        isSeeking = false;
+        player.mux.emit('seeked');
+      }
       if (player.playbackCallback && player.playbackCallback.onbufferingcomplete) {
         setTimeout(() => {
           player.playbackCallback.onbufferingcomplete();
@@ -222,6 +230,11 @@ const monitorTizenPlayer = function (player, options) {
   };
   webapis.avplay.setListener(playbackListener);
 
+  var lastPlaybackTimeUpdated = Date.now();
+  var lastPlaybackPosition = 0;
+  const MAX_SECONDS_SEEK_PLAYHEAD_SHIFT = 500;
+  const SEEK_PLAYHEAD_DRIFT_MS = 200;
+
   player.checkStatusInterval = window.setInterval(function() {
     try {
       let playerState = webapis.avplay.getState();
@@ -249,6 +262,20 @@ const monitorTizenPlayer = function (player, options) {
         log.info('state transition ' + lastPlayerState + ' -> ' + playerState);
       }
       lastPlayerState = playerState;
+
+      if (isBuffering && playerState === 'PLAYING') {
+        if (!isSeeking) {
+          var playheadTimeElapsed = webapis.avplay.getCurrentTime() - lastPlaybackPosition;
+          var wallTimeElapsed = Date.now() - lastPlaybackTimeUpdated;
+          var drift = playheadTimeElapsed - wallTimeElapsed;
+          if (Math.abs(playheadTimeElapsed) > MAX_SECONDS_SEEK_PLAYHEAD_SHIFT &&
+                  Math.abs(drift) > SEEK_PLAYHEAD_DRIFT_MS) {
+              isSeeking = true;
+              player.mux.emit('seeking');
+          }
+        }
+      }
+      lastPlaybackTimeUpdated = Date.now();
     } catch(e) {
       log.error(e);
     }
