@@ -2,11 +2,11 @@ const path = require('path');
 const WebpackAutoInject = require('webpack-auto-inject-version');
 
 module.exports = {
-  entry: './src/entry.js',
+  entry: './src/index.js',
   output: {
     filename: 'tizen-mux.js',
     path: path.resolve(__dirname, 'build'),
-    library: 'monitorTizenPlayer',
+    library: 'tizenMux',
     libraryTarget: 'umd',
     umdNamedDefine: true
   },
