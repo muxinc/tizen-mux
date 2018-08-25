@@ -14,7 +14,7 @@ if (environment === 'production') {
 let fullVersion = pkg.version;
 let majorVersion = fullVersion.split('.')[0];
 
-let file = fs.readFileSync('dist/player-mux.js');
+let file = fs.readFileSync('dist/tizen-mux.js');
 let bucket = new AWS.S3({params: {Bucket: bucketName}});
 
 Promise.all([

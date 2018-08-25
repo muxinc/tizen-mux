@@ -1,9 +1,10 @@
 {
   "name": "mux-player-sdk-framework",
-  "version": "2.1.0",
+  "version": "0.1.0",
   "author": "Mux, Inc.",
-  "description": "Mux analytics plugin for <player name>",
+  "description": "Mux analytics plugin for Samsung Tizen AVPlay applications",
   "main": "dist/tizen-mux.js",
+  "license": "MIT",
   "scripts": {
     "nsp": "nsp check",
     "clean": "rm -rf build dist",

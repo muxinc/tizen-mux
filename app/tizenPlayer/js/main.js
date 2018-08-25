@@ -118,56 +118,56 @@ var app = {
     },
 
     play: function() {
-      var playbackListener = {
-          onbufferingstart: function () {
-          },
+        var playbackListener = {
+            onbufferingstart: function () {
+        },
 
-          onbufferingprogress: function (percent) {
-          },
+        onbufferingprogress: function (percent) {
+        },
 
-          onbufferingcomplete: function () {
-          },
+        onbufferingcomplete: function () {
+        },
 
-          oncurrentplaytime: function (currentTime) {
+        oncurrentplaytime: function (currentTime) {
             //console.log("Current playtime: " + currentTime);
-          },
+        },
 
-          onstreamcompleted: function () {
-        	  app.stop();
-          },
+        onstreamcompleted: function () {
+            app.stop();
+        },
 
-          onevent: function (eventType, eventData) {
+        onevent: function (eventType, eventData) {
             console.log("eventType: " + eventType + ", " + eventData);
-          },
+        },
 
-          onerror: function (eventType) {
-          },
+        onerror: function (eventType) {
+        },
 
-          ondrmevent: function(drmEvent, drmData) {
-          },
+        ondrmevent: function(drmEvent, drmData) {
+        },
 
-          onsubtitlechange: function(duration, text, type, attriCount, attributes) {
-          }
-      }
-      var player = $('#thePlayer').get(0);
-      player.url = this.url;
-      player.playbackCallback = playbackListener;
-      var playerInitTime = Date.now();
-      this.prepare();
-      tizenMux.monitorTizenPlayer(player, {
-          debug: true,
-          data: {
+        onsubtitlechange: function(duration, text, type, attriCount, attributes) {
+        }
+    }
+    var player = $('#thePlayer').get(0);
+    player.url = this.url;
+    player.playbackCallback = playbackListener;
+    var playerInitTime = Date.now();
+    this.prepare();
+    monitorTizenPlayer(player, {
+        debug: true,
+        data: {
             video_title: 'Big Buck Bunny',
             env_key: '[YOUR ENVIRONMENT KEY]',
             player_init_time: playerInitTime,
-          }
-      });
+        }
+    });
     },
 
     stop: function() {
-      var player = $('#thePlayer').get(0);
-      tizenMux.stopMonitor(player);
-      webapis.avplay.stop();
+        var player = $('#thePlayer').get(0);
+        player.mux.stopMonitor();
+        webapis.avplay.stop();
     }
 };
 
