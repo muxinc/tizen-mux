@@ -216,6 +216,7 @@ const monitorTizenPlayer = function (player, options) {
         case 'IDLE':
           if (playerState === 'PLAYING') {
             onResolutionChanged();
+            player.mux.emit('play');
             player.mux.emit('playing');
           }
           break;
@@ -226,6 +227,7 @@ const monitorTizenPlayer = function (player, options) {
           break;
         case 'PAUSED':
           if (playerState === 'PLAYING') {
+            player.mux.emit('play');
             player.mux.emit('playing');
           }
           break;
