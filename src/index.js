@@ -17,6 +17,12 @@ const monitorTizenPlayer = function (player, options) {
 
   // Prepare the data passed in
   options = options || {};
+  const defaults = {
+    // Allow customers to be in full control of the "errors" that are fatal
+    automaticErrorTracking: true
+  };
+
+  options = assign(defaults, options);
 
   options.data = assign({
     player_software_name: 'Tizen AVPlayer',
@@ -174,6 +180,7 @@ const monitorTizenPlayer = function (player, options) {
     },
 
     onerror: function (eventType) {
+      if (!options.automaticErrorTracking) { return; }
       player.mux.emit('error', { player_error_code: -1, player_error_message: eventType });
       if (player.playbackCallback && player.playbackCallback.onerror) {
         setTimeout(() => {
