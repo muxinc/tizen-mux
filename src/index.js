@@ -3,6 +3,7 @@ import mux from 'mux-embed';
 
 const log = mux.log;
 const assign = mux.utils.assign;
+const getTimestamp = mux.utils.getTimestamp;
 
 // Helper function to generate "unique" IDs for the player
 const generateShortId = function () {
@@ -208,7 +209,7 @@ const monitorTizenPlayer = function (player, options) {
 
   webapis.avplay.setListener(playbackListener);
 
-  let lastPlaybackTimeUpdated = Date.now();
+  let lastPlaybackTimeUpdated = getTimestamp();
   let lastPlaybackPosition = 0;
   const MAX_SECONDS_SEEK_PLAYHEAD_SHIFT = 500;
   const SEEK_PLAYHEAD_DRIFT_MS = 200;
@@ -247,7 +248,7 @@ const monitorTizenPlayer = function (player, options) {
       if (isBuffering && playerState === 'PLAYING') {
         if (!isSeeking) {
           const playheadTimeElapsed = webapis.avplay.getCurrentTime() - lastPlaybackPosition;
-          const wallTimeElapsed = Date.now() - lastPlaybackTimeUpdated;
+          const wallTimeElapsed = getTimestamp() - lastPlaybackTimeUpdated;
           const drift = playheadTimeElapsed - wallTimeElapsed;
 
           if (Math.abs(playheadTimeElapsed) > MAX_SECONDS_SEEK_PLAYHEAD_SHIFT && Math.abs(drift) > SEEK_PLAYHEAD_DRIFT_MS) {
@@ -256,7 +257,7 @@ const monitorTizenPlayer = function (player, options) {
           }
         }
       }
-      lastPlaybackTimeUpdated = Date.now();
+      lastPlaybackTimeUpdated = getTimestamp();
     } catch (e) {
       log.error(e);
     }
