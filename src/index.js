@@ -31,6 +31,20 @@ const monitorTizenPlayer = function (player, options) {
     player_mux_plugin_version: '[AIV]{version}[/AIV]'
   }, options.data);
 
+  // AVPlay only allows for one listener to be set, so we need to
+  // allow the customer to pass their own listener
+  const passthroughPlaybackCallback = assign({
+    onbufferingstart: function () { return; },
+    onbufferingprogress: function (percent) { return; },
+    onbufferingcomplete: function () { return; },
+    onstreamcompleted: function () { return; },
+    oncurrentplaytime: function () { return; },
+    onerror: function (eventType) { return; },
+    onevent: function (eventType, eventData) { return; },
+    onsubtitlechange: function (duration, text, type, attriCount, attributes) { return; },
+    ondrmevent: function (drmEvent, drmData) { return; }
+  }, options.playbackCallback || {});
+
   // Retrieve the ID and the player element
   const playerID = generateShortId();
 
@@ -115,19 +129,15 @@ const monitorTizenPlayer = function (player, options) {
         player.mux.emit('loadstart');
         loadStarts = true;
       }
-      if (player.playbackCallback && player.playbackCallback.onbufferingstart) {
-        setTimeout(() => {
-          player.playbackCallback.onbufferingstart();
-        }, 0);
-      }
+      setTimeout(() => {
+        passthroughPlaybackCallback.onbufferingstart();
+      }, 0);
     },
 
     onbufferingprogress: function (percent) {
-      if (player.playbackCallback && player.playbackCallback.onbufferingprogress) {
-        setTimeout(() => {
-          player.playbackCallback.onbufferingprogress(percent);
-        }, 0);
-      }
+      setTimeout(() => {
+        passthroughPlaybackCallback.onbufferingprogress(percent);
+      }, 0);
     },
 
     onbufferingcomplete: function () {
@@ -136,29 +146,23 @@ const monitorTizenPlayer = function (player, options) {
         isSeeking = false;
         player.mux.emit('seeked');
       }
-      if (player.playbackCallback && player.playbackCallback.onbufferingcomplete) {
-        setTimeout(() => {
-          player.playbackCallback.onbufferingcomplete();
-        }, 0);
-      }
+      setTimeout(() => {
+        player.playbackCallback.onbufferingcomplete();
+      }, 0);
     },
 
     oncurrentplaytime: function (currentTime) {
       player.mux.emit('timeupdate');
-      if (player.playbackCallback && player.playbackCallback.oncurrentplaytime) {
-        setTimeout(() => {
-          player.playbackCallback.oncurrentplaytime(currentTime);
-        }, 0);
-      }
+      setTimeout(() => {
+        player.playbackCallback.oncurrentplaytime(currentTime);
+      }, 0);
     },
 
     onstreamcompleted: function () {
       player.mux.emit('ended');
-      if (player.playbackCallback && player.playbackCallback.onstreamcompleted) {
-        setTimeout(() => {
-          player.playbackCallback.onstreamcompleted();
-        }, 0);
-      }
+      setTimeout(() => {
+        player.playbackCallback.onstreamcompleted();
+      }, 0);
     },
 
     onevent: function (eventType, eventData) {
@@ -172,43 +176,35 @@ const monitorTizenPlayer = function (player, options) {
       } else if (eventType === 'PLAYER_MSG_HTTP_ERROR_CODE') {
         // Note: This event has the same problem as PLAYER_MSG_FRAGMENT_INFO.
       }
-      if (player.playbackCallback && player.playbackCallback.onevent) {
-        setTimeout(() => {
-          player.playbackCallback.onevent(eventType, eventData);
-        }, 0);
-      }
+      setTimeout(() => {
+        player.playbackCallback.onevent(eventType, eventData);
+      }, 0);
     },
 
     onerror: function (eventType) {
       if (!options.automaticErrorTracking) { return; }
       player.mux.emit('error', { player_error_code: -1, player_error_message: eventType });
-      if (player.playbackCallback && player.playbackCallback.onerror) {
-        setTimeout(() => {
-          player.playbackCallback.onerror(eventType);
-        }, 0);
-      }
+      setTimeout(() => {
+        player.playbackCallback.onerror(eventType);
+      }, 0);
     },
 
     ondrmevent: function (drmEvent, drmData) {
-      if (player.playbackCallback && player.playbackCallback.ondrmevent) {
-        setTimeout(() => {
-          player.playbackCallback.ondrmevent(drmEvent, drmData);
-        }, 0);
-      }
+      setTimeout(() => {
+        player.playbackCallback.ondrmevent(drmEvent, drmData);
+      }, 0);
     },
 
     onsubtitlechange: function (duration, text, type, attriCount, attributes) {
-      if (player.playbackCallback && player.playbackCallback.onsubtitlechange) {
-        setTimeout(() => {
-          player.playbackCallback.onsubtitlechange(duration, text, type, attriCount, attributes);
-        }, 0);
-      }
+      setTimeout(() => {
+        player.playbackCallback.onsubtitlechange(duration, text, type, attriCount, attributes);
+      }, 0);
     }
   };
 
   webapis.avplay.setListener(playbackListener);
 
-  let lastPlaybackTimeUpdated = Date.now();
+  let lastPlaybackTimeUpdated = mux.utils.now();
   let lastPlaybackPosition = 0;
   const MAX_SECONDS_SEEK_PLAYHEAD_SHIFT = 500;
   const SEEK_PLAYHEAD_DRIFT_MS = 200;
@@ -247,7 +243,7 @@ const monitorTizenPlayer = function (player, options) {
       if (isBuffering && playerState === 'PLAYING') {
         if (!isSeeking) {
           const playheadTimeElapsed = webapis.avplay.getCurrentTime() - lastPlaybackPosition;
-          const wallTimeElapsed = Date.now() - lastPlaybackTimeUpdated;
+          const wallTimeElapsed = mux.utils.now() - lastPlaybackTimeUpdated;
           const drift = playheadTimeElapsed - wallTimeElapsed;
 
           if (Math.abs(playheadTimeElapsed) > MAX_SECONDS_SEEK_PLAYHEAD_SHIFT && Math.abs(drift) > SEEK_PLAYHEAD_DRIFT_MS) {
@@ -256,7 +252,7 @@ const monitorTizenPlayer = function (player, options) {
           }
         }
       }
-      lastPlaybackTimeUpdated = Date.now();
+      lastPlaybackTimeUpdated = mux.utils.now();
     } catch (e) {
       log.error(e);
     }
@@ -265,9 +261,6 @@ const monitorTizenPlayer = function (player, options) {
   // Expose ability to stop monitoring
   player.mux.stopMonitor = () => {
     window.clearInterval(player.checkStatusInterval);
-    if (player.playbackCallback) {
-      webapis.avplay.setListener(player.playbackCallback);
-    }
     player.mux.emit('destroy');
     player.mux.emit = function () {};
   };
