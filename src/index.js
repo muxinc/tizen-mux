@@ -33,7 +33,7 @@ const monitorTizenPlayer = function (player, options) {
 
   // AVPlay only allows for one listener to be set, so we need to
   // allow the customer to pass their own listener
-  const passthroughPlaybackCallback = assign({
+  const passthroughPlaybackListener = assign({
     onbufferingstart: function () { return; },
     onbufferingprogress: function (percent) { return; },
     onbufferingcomplete: function () { return; },
@@ -43,7 +43,7 @@ const monitorTizenPlayer = function (player, options) {
     onevent: function (eventType, eventData) { return; },
     onsubtitlechange: function (duration, text, type, attriCount, attributes) { return; },
     ondrmevent: function (drmEvent, drmData) { return; }
-  }, options.playbackCallback || {});
+  }, options.playbackListener || {});
 
   // Retrieve the ID and the player element
   const playerID = generateShortId();
@@ -130,13 +130,13 @@ const monitorTizenPlayer = function (player, options) {
         loadStarts = true;
       }
       setTimeout(() => {
-        passthroughPlaybackCallback.onbufferingstart();
+        passthroughPlaybackListener.onbufferingstart();
       }, 0);
     },
 
     onbufferingprogress: function (percent) {
       setTimeout(() => {
-        passthroughPlaybackCallback.onbufferingprogress(percent);
+        passthroughPlaybackListener.onbufferingprogress(percent);
       }, 0);
     },
 
@@ -147,21 +147,21 @@ const monitorTizenPlayer = function (player, options) {
         player.mux.emit('seeked');
       }
       setTimeout(() => {
-        player.playbackCallback.onbufferingcomplete();
+        player.playbackListener.onbufferingcomplete();
       }, 0);
     },
 
     oncurrentplaytime: function (currentTime) {
       player.mux.emit('timeupdate');
       setTimeout(() => {
-        player.playbackCallback.oncurrentplaytime(currentTime);
+        player.playbackListener.oncurrentplaytime(currentTime);
       }, 0);
     },
 
     onstreamcompleted: function () {
       player.mux.emit('ended');
       setTimeout(() => {
-        player.playbackCallback.onstreamcompleted();
+        player.playbackListener.onstreamcompleted();
       }, 0);
     },
 
@@ -177,7 +177,7 @@ const monitorTizenPlayer = function (player, options) {
         // Note: This event has the same problem as PLAYER_MSG_FRAGMENT_INFO.
       }
       setTimeout(() => {
-        player.playbackCallback.onevent(eventType, eventData);
+        player.playbackListener.onevent(eventType, eventData);
       }, 0);
     },
 
@@ -185,19 +185,19 @@ const monitorTizenPlayer = function (player, options) {
       if (!options.automaticErrorTracking) { return; }
       player.mux.emit('error', { player_error_code: -1, player_error_message: eventType });
       setTimeout(() => {
-        player.playbackCallback.onerror(eventType);
+        player.playbackListener.onerror(eventType);
       }, 0);
     },
 
     ondrmevent: function (drmEvent, drmData) {
       setTimeout(() => {
-        player.playbackCallback.ondrmevent(drmEvent, drmData);
+        player.playbackListener.ondrmevent(drmEvent, drmData);
       }, 0);
     },
 
     onsubtitlechange: function (duration, text, type, attriCount, attributes) {
       setTimeout(() => {
-        player.playbackCallback.onsubtitlechange(duration, text, type, attriCount, attributes);
+        player.playbackListener.onsubtitlechange(duration, text, type, attriCount, attributes);
       }, 0);
     }
   };
