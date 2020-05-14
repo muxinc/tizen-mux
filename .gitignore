@@ -40,3 +40,6 @@ es5
 sandbox
 
 .env
+
+# Tizen Studio files
+.project
