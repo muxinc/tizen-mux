@@ -1,6 +1,6 @@
 {
   "name": "mux-player-sdk-framework",
-  "version": "0.3.0",
+  "version": "1.0.0",
   "author": "Mux, Inc.",
   "description": "Mux analytics plugin for Samsung Tizen AVPlay applications",
   "main": "dist/tizen-mux.js",
