@@ -147,21 +147,21 @@ const monitorTizenPlayer = function (player, options) {
         player.mux.emit('seeked');
       }
       setTimeout(() => {
-        player.playbackListener.onbufferingcomplete();
+        passthroughPlaybackListener.onbufferingcomplete();
       }, 0);
     },
 
     oncurrentplaytime: function (currentTime) {
       player.mux.emit('timeupdate');
       setTimeout(() => {
-        player.playbackListener.oncurrentplaytime(currentTime);
+        passthroughPlaybackListener.oncurrentplaytime(currentTime);
       }, 0);
     },
 
     onstreamcompleted: function () {
       player.mux.emit('ended');
       setTimeout(() => {
-        player.playbackListener.onstreamcompleted();
+        passthroughPlaybackListener.onstreamcompleted();
       }, 0);
     },
 
@@ -177,7 +177,7 @@ const monitorTizenPlayer = function (player, options) {
         // Note: This event has the same problem as PLAYER_MSG_FRAGMENT_INFO.
       }
       setTimeout(() => {
-        player.playbackListener.onevent(eventType, eventData);
+        passthroughPlaybackListener.onevent(eventType, eventData);
       }, 0);
     },
 
@@ -185,19 +185,19 @@ const monitorTizenPlayer = function (player, options) {
       if (!options.automaticErrorTracking) { return; }
       player.mux.emit('error', { player_error_code: -1, player_error_message: eventType });
       setTimeout(() => {
-        player.playbackListener.onerror(eventType);
+        passthroughPlaybackListener.onerror(eventType);
       }, 0);
     },
 
     ondrmevent: function (drmEvent, drmData) {
       setTimeout(() => {
-        player.playbackListener.ondrmevent(drmEvent, drmData);
+        passthroughPlaybackListener.ondrmevent(drmEvent, drmData);
       }, 0);
     },
 
     onsubtitlechange: function (duration, text, type, attriCount, attributes) {
       setTimeout(() => {
-        player.playbackListener.onsubtitlechange(duration, text, type, attriCount, attributes);
+        passthroughPlaybackListener.onsubtitlechange(duration, text, type, attriCount, attributes);
       }, 0);
     }
   };
