@@ -96,7 +96,7 @@ const monitorTizenPlayer = function (player, options) {
       player_autoplay_on: player.autoplay,
       player_preload_on: player.preload,
       video_source_url: player.url,
-      video_source_mime_type: player.mimeType,
+      video_source_mime_type: player.mimeType && player.mimeType.toLowerCase(),
       video_poster_url: player.poster,
       player_language_code: player.language
     };
