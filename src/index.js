@@ -58,9 +58,12 @@ const monitorTizenPlayer = function (player, options) {
   var lastPlayerState = 'NONE';
   var videoSourceWidth = 0;
   var videoSourceHeight = 0;
+  var videoSourceBitrate = 0;
+
   var loadStarts = false;
   var onResolutionChanged = function () {
     let streamInfo = webapis.avplay.getCurrentStreamInfo();
+    let newVideoSourceBitrate = videoSourceBitrate;
 
     for (let i = 0; i < streamInfo.length; i++) {
       let track = streamInfo[i];
@@ -71,11 +74,22 @@ const monitorTizenPlayer = function (player, options) {
 
           videoSourceWidth = parseInt(json.Width);
           videoSourceHeight = parseInt(json.Height);
+          newVideoSourceBitrate = parseInt(json.Bit_rate);
         } else {
           videoSourceWidth = track.extra_info.Width;
           videoSourceHeight = track.extra_info.Height;
+          newVideoSourceBitrate = (track.extra_info.Bit_rate);
         }
       }
+    }
+
+    if (newVideoSourceBitrate !== videoSourceBitrate) {
+      videoSourceBitrate = newVideoSourceBitrate;
+      player.mux.emit('renditionchange', {
+        video_source_bitrate: videoSourceBitrate,
+        video_source_width: videoSourceWidth,
+        video_source_height: videoSourceHeight
+      });
     }
   };
   var isBuffering = false;
