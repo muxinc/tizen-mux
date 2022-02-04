@@ -158,8 +158,8 @@ var app = {
       debug: true,
       data: {
         video_title: 'Big Buck Bunny',
-        env_key: '[YOUR ENVIRONMENT KEY]',
-        player_init_time: playerInitTime,
+        property_key: '[YOUR ENVIRONMENT KEY]',
+        player_init_time: playerInitTime
       }
     });
   },
@@ -186,9 +186,14 @@ $(document).ready(function () {
   app.KEY_PAUSE = 10;
   app.KEY_BACK = 11;
   app.KEY_STOP = 12;
-  //app.url = 'http://184.72.239.149/vod/smil:BigBuckBunny.smil/playlist.m3u8';
-  //app.url = 'https://cspan1nontve-lh.akamaihd.net/i/CSpan1NonTVE_1@312667/index_400_av-p.m3u8';
-  app.url = 'http://dash.edgesuite.net/envivio/EnvivioDash3/manifest.mpd';
+
+  // HLS
+  // app.url = 'https://devstreaming-cdn.apple.com/videos/streaming/examples/img_bipbop_adv_example_ts/master.m3u8';
+
+  // Dash
+  // app.url = 'http://dash.edgesuite.net/envivio/EnvivioDash3/manifest.mpd';
+
+  app.url = 'https://vjs.zencdn.net/v/oceans.mp4';
 
   app.init();
 });
