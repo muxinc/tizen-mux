@@ -63,7 +63,6 @@ const monitorTizenPlayer = function (player, options) {
   var loadStarts = false;
   var onResolutionChanged = function () {
     let streamInfo = webapis.avplay.getCurrentStreamInfo();
-    let newVideoSourceBitrate = videoSourceBitrate;
 
     for (let i = 0; i < streamInfo.length; i++) {
       let track = streamInfo[i];
@@ -71,26 +70,15 @@ const monitorTizenPlayer = function (player, options) {
       if (track.type === 'VIDEO' && track.extra_info) {
         if (typeof track.extra_info === 'string') {
           let json = JSON.parse(track.extra_info);
-
           videoSourceWidth = parseInt(json.Width);
           videoSourceHeight = parseInt(json.Height);
-          newVideoSourceBitrate = parseInt(json.Bit_rate);
         } else {
           videoSourceWidth = track.extra_info.Width;
           videoSourceHeight = track.extra_info.Height;
-          newVideoSourceBitrate = (track.extra_info.Bit_rate);
         }
       }
     }
 
-    if (newVideoSourceBitrate !== videoSourceBitrate) {
-      videoSourceBitrate = newVideoSourceBitrate;
-      player.mux.emit('renditionchange', {
-        video_source_bitrate: videoSourceBitrate,
-        video_source_width: videoSourceWidth,
-        video_source_height: videoSourceHeight
-      });
-    }
   };
   var isBuffering = false;
   var isSeeking = false;
@@ -125,6 +113,10 @@ const monitorTizenPlayer = function (player, options) {
     if (videoSourceHeight !== 0) {
       stateData.video_source_height = videoSourceHeight;
     }
+    if (videoSourceBitrate !== 0) {
+      stateData.video_source_bitrate = videoSourceBitrate;
+    }
+
     // Additional peferred properties
     if (lastPlayerState !== 'NONE' && lastPlayerState !== 'IDLE') {
       const duration = webapis.avplay.getDuration();
@@ -181,6 +173,23 @@ const monitorTizenPlayer = function (player, options) {
 
     onevent: function (eventType, eventData) {
       if (eventType === 'PLAYER_MSG_BITRATE_CHANGE') {
+        let bitrateLabel = 'BITRATE:';
+
+        if (eventData.indexOf(bitrateLabel) !== -1) {
+          let bitrate = parseInt(eventData.substring(bitrateLabel.length));
+
+          // Skip if it is the initial
+          if (videoSourceBitrate !== 0) {
+            player.mux.emit('renditionchange', {
+              video_source_bitrate: bitrate,
+              video_source_width: videoSourceWidth,
+              video_source_height: videoSourceHeight
+            });
+          }
+
+          videoSourceBitrate = bitrate;
+        }
+
         player.mux.emit('ratechange');
       } else if (eventType === 'PLAYER_MSG_RESOLUTION_CHANGED') {
         onResolutionChanged();
