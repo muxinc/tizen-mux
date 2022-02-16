@@ -70,6 +70,7 @@ const monitorTizenPlayer = function (player, options) {
       if (track.type === 'VIDEO' && track.extra_info) {
         if (typeof track.extra_info === 'string') {
           let json = JSON.parse(track.extra_info);
+
           videoSourceWidth = parseInt(json.Width);
           videoSourceHeight = parseInt(json.Height);
         } else {
@@ -78,8 +79,8 @@ const monitorTizenPlayer = function (player, options) {
         }
       }
     }
-
   };
+
   var isBuffering = false;
   var isSeeking = false;
 
