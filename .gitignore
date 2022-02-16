@@ -38,6 +38,7 @@ build
 dist
 es5
 sandbox
+app/tizenPlayer/js/tizen-mux.js
 
 .env
 

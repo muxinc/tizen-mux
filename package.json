@@ -1,6 +1,6 @@
 {
   "name": "mux-player-sdk-framework",
-  "version": "2.2.0",
+  "version": "2.3.0",
   "author": "Mux, Inc.",
   "description": "Mux analytics plugin for Samsung Tizen AVPlay applications",
   "main": "dist/tizen-mux.js",
@@ -13,6 +13,8 @@
     "test": "npm-run-all lint",
     "package": "npm-run-all clean mkdirs lint test package:build package:remove-requirejs-support package:bannerize",
     "package:build": "webpack --config webpack.prod.js",
+    "link": "ln -f ./build/tizen-mux.js ./app/tizenPlayer/js/tizen-mux.js",
+    "package:devbuild": "webpack --config webpack.dev.js && npm run link",
     "package:remove-requirejs-support": "echo '(function(){var define=false;' > dist/tizen-mux.js && cat build/tizen-mux.js >> dist/tizen-mux.js && echo '})();' >> dist/tizen-mux.js",
     "package:bannerize": "bannerize dist/tizen-mux.js --banner=scripts/banner.ejs",
     "start": "webpack-dev-server --open --config webpack.dev.js",
