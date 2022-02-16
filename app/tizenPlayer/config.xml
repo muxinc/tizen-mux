@@ -17,4 +17,5 @@
     <tizen:privilege name="http://tizen.org/privilege/tv.audio"/>
     <tizen:profile name="tv"/>
     <tizen:setting screen-orientation="landscape" context-menu="enable" background-support="disable" encryption="disable" install-location="auto" hwkey-event="enable"/>
+    <access origin="*"></access>
 </widget>
